@@ -7,6 +7,7 @@ package modbus
 import (
 	"encoding/binary"
 	"fmt"
+	"os"
 )
 
 // ClientHandler is the interface that groups the Packager and Transporter methods.
@@ -417,11 +418,10 @@ func (mb *client) ReadWriteMultipleRegisters(readAddress, readQuantity, writeAdd
 	if err != nil {
 		return
 	}
-	//count := int(response.Data[0])
-	//if count != (len(response.Data) - 1) {
-	//	err = fmt.Errorf("modbus: response data size '%v' does not match count '%v'", len(response.Data)-1, count)
-	//	return
-	//}
+	count := int(response.Data[0])
+	if count != (len(response.Data) - 1) {
+		_, _ = fmt.Fprintf(os.Stderr, "modbus: response data size '%v' does not match expected count '%v'. Response data: '% 02X'. ignoring error\n", len(response.Data)-1, count, response.Data)
+	}
 	results = response.Data[1:]
 	return
 }
